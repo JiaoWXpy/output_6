@@ -1,6 +1,6 @@
 import pandas as pd
 import csv
-
+import numpy as np
 def count_list_heng(data_list):
     """
     将集合均分，每份n个元素
@@ -155,14 +155,10 @@ def read_rule():
 def return_detial_rule(rule_list):
     new_rule_list = []
     for i in rule_list:
-        print(i)
-        if i > 0:
-            for j in range(0, i):
-                new_rule_list.append(1)
+        new_rule_list.append(int(i))
 
-        else:
-            for k in range(0, -i):
-                new_rule_list.append(-1)
+
+
     return new_rule_list
 def save_df(dict,fp):
     excel_writer = pd.ExcelWriter("output_" + fp)  # 定义writer，选择文件（文件可以不存在）
@@ -192,10 +188,12 @@ if __name__ == '__main__':
         print(rule_map)
         rule_count = 0#规则计数
         count_0 = 0
+        currnt_rule = 0
+        in_list3_heng = False
         for i, data in enumerate(current_data_all):
             result["raw"].append(data)
             #print(i,data)
-            
+
             #第一个数字，直接在结果增加None
             if i < 1:
                 result["result"].append(None)
@@ -204,55 +202,69 @@ if __name__ == '__main__':
             #从第二个数字开始
             else:
                 #横向
-                if rule_map[rule_count] == 1:
-          
-                    if rule_map[rule_count -1] == -1:
-                        list3_tmp = return_list3_heng(i, data_list)
+                if rule_map[currnt_rule] > 0:
+                    if rule_count == 0 and not in_list3_heng:
+                        list3_tmp = return_list3_heng(i -1, data_list)
                         if list3_tmp != False:
                             list3 = list3_tmp
-    
                     if not str_in_list3_heng(data, list3):
                         result["result"].append(0)
                         count_0 += 1
+                        in_list3_heng = True
                     else:
                         result["result"].append(count_0 + 1)
                         count_0 = 0
                         list3_tmp = return_list3_heng(i, current_data_all)
                         if list3_tmp != False:
-                            list3 = list3_tmp       
+                            list3 = list3_tmp
+                        rule_count += 1
+
+                        if rule_count >= np.abs(rule_map[currnt_rule]):
+                            rule_count = 0
+                            currnt_rule += 1
+                        if currnt_rule >= len(rule_map):
+                            currnt_rule = 0
+                        in_list3_heng = False
                     # print(output)
                     result["count_3"].append("".join(list3))
                     result["rule"].append("横")
+                    in_list3_xie = False
                 #斜向
-                elif rule_map[rule_count] == -1:
-
-                    if rule_map[rule_count -1] == 1:
+                elif rule_map[currnt_rule] < 0:
+                    if rule_count == 0 and not in_list3_xie:
                         list3_tmp = return_list3_xie(i, data_list)
                         if list3_tmp != False:
                             list3 = list3_tmp
-        
                     if not str_in_list3_xie(data, list3):
                         result["result"].append(0)
                         count_0 += 1
+                        in_list3_xie = True
                     else:
                         result["result"].append(count_0 + 1)
                         count_0 = 0
-                        list3_tmp = return_list3_xie(i, current_data_all)
+
+                        list3_tmp = return_list3_xie(i +1, current_data_all)
                         if list3_tmp != False:
                             list3 = list3_tmp
+                        rule_count += 1
+
+                        if rule_count >= np.abs(rule_map[currnt_rule]):
+                            rule_count = 0
+                            currnt_rule += 1
+                        if currnt_rule >= len(rule_map):
+                            currnt_rule = 0
+                        in_list3_xie = False
                     # print(output)
                     result["count_3"].append("".join(list3))
                     result["rule"].append("斜")
+                    in_list3_heng = False
 
-                rule_count += 1
-                if rule_count >= len(rule_map):
-                    rule_count = 0
+
+
+
         print("result count:{}".format(len(result["result"])))
         print(result["result"])
         #print(result)
-        #print(len(result["raw"]),len(result["count_3"]),len(result["result"]),len(result["rule"]))
+        print(len(result["raw"]),len(result["count_3"]),len(result["result"]),len(result["rule"]))
+    #print(result)
     save_df(result,'result.xlsx')
-
-                
-
-
