@@ -171,10 +171,11 @@ def save_df(dict,fp):
 if __name__ == '__main__':
     #读取规则文件
     rule_list = read_rule()
+    #rule_list = [rule_list[1],rule_list[0]]
     #读取原始数据
     data_list = read_data()
     #print(data_list)
-    print(return_list3_xie(6,data_list))
+    #print(return_list3_xie(6,data_list))
 
 
     #记录结果的字典
@@ -185,11 +186,12 @@ if __name__ == '__main__':
         #遍历第n条规则的数值
         list3 = return_list3_heng(0, current_data_all)#第一个三位数字
         rule_map = return_detial_rule(rule[2])#
-        print(rule_map)
+        #print(rule_map)
         rule_count = 0#规则计数
         count_0 = 0
         currnt_rule = 0
         in_list3_heng = False
+        in_list3_xie = False
         for i, data in enumerate(current_data_all):
             result["raw"].append(data)
             #print(i,data)
@@ -204,7 +206,8 @@ if __name__ == '__main__':
                 #横向
                 if rule_map[currnt_rule] > 0:
                     if rule_count == 0 and not in_list3_heng:
-                        list3_tmp = return_list3_heng(i -1, data_list)
+                        list3_tmp = return_list3_heng(i-1, current_data_all)
+                        print(list3_tmp)
                         if list3_tmp != False:
                             list3 = list3_tmp
                     if not str_in_list3_heng(data, list3):
@@ -225,14 +228,14 @@ if __name__ == '__main__':
                         if currnt_rule >= len(rule_map):
                             currnt_rule = 0
                         in_list3_heng = False
-                    # print(output)
+  
                     result["count_3"].append("".join(list3))
                     result["rule"].append("横")
                     in_list3_xie = False
                 #斜向
                 elif rule_map[currnt_rule] < 0:
                     if rule_count == 0 and not in_list3_xie:
-                        list3_tmp = return_list3_xie(i, data_list)
+                        list3_tmp = return_list3_xie(i, current_data_all)
                         if list3_tmp != False:
                             list3 = list3_tmp
                     if not str_in_list3_xie(data, list3):
@@ -254,7 +257,7 @@ if __name__ == '__main__':
                         if currnt_rule >= len(rule_map):
                             currnt_rule = 0
                         in_list3_xie = False
-                    # print(output)
+
                     result["count_3"].append("".join(list3))
                     result["rule"].append("斜")
                     in_list3_heng = False
@@ -262,8 +265,8 @@ if __name__ == '__main__':
 
 
 
-        print("result count:{}".format(len(result["result"])))
-        print(result["result"])
+        #print("result count:{}".format(len(result["result"])))
+        #print(result["result"])
         #print(result)
         print(len(result["raw"]),len(result["count_3"]),len(result["result"]),len(result["rule"]))
     #print(result)
